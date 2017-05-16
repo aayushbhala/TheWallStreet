@@ -218,6 +218,8 @@ public class StockEditorActivity extends AppCompatActivity {
                 values.put(StockEntry.COLUMN_STOCK_CURRENT_PRICE, data.get(0).getCurrentPrice());
                 values.put(StockEntry.COLUMN_STOCK_CHANGE, data.get(0).getChange());
                 values.put(StockEntry.COLUMN_STOCK_UPDATED, data.get(0).getDate());
+                values.put(StockEntry.COLUMN_STOCK_TODAYS_HIGH, data.get(0).getHigh());
+                values.put(StockEntry.COLUMN_STOCK_TODAYS_LOW, data.get(0).getLow());
 
                 int rowsAffetcted = getContentResolver().update(uri, values, null, null);
                 if (rowsAffetcted == 0) {

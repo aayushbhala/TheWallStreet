@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.android.thestreet.data.StockContract;
 import com.example.android.thestreet.data.StockContract.StockEntry;
 import com.example.android.thestreet.data.StockDbHelper;
 
@@ -155,9 +156,11 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
                     StockEntry.COLUMN_STOCK_UPDATED,
                     StockEntry.COLUMN_STOCK_PURCHASE_PRICE,
                     StockEntry.COLUMN_STOCK_TODAYS_HIGH,
-                    StockEntry.COLUMN_STOCK_TODAYS_LOW
+                    StockEntry.COLUMN_STOCK_TODAYS_LOW,
+                    "(("+ StockContract.StockEntry.COLUMN_STOCK_CURRENT_PRICE+"-"+ StockContract.StockEntry.COLUMN_STOCK_PURCHASE_PRICE+")*"+
+                            StockContract.StockEntry.COLUMN_STOCK_VOLUME+") AS gainers"
             };
-            return new CursorLoader(MainActivity.this,StockEntry.CONTENT_URI,projections,null,null,null);
+            return new CursorLoader(MainActivity.this,StockEntry.CONTENT_URI,projections,null,null,"gainers DESC");
         }
 
         @Override
@@ -217,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
             values.put(StockEntry.COLUMN_STOCK_CURRENT_PRICE,data.get(i).getCurrentPrice());
             values.put(StockEntry.COLUMN_STOCK_CHANGE,data.get(i).getChange());
             values.put(StockEntry.COLUMN_STOCK_UPDATED, data.get(i).getDate());
+            values.put(StockEntry.COLUMN_STOCK_TODAYS_HIGH, data.get(i).getHigh());
+            values.put(StockEntry.COLUMN_STOCK_TODAYS_LOW, data.get(i).getLow());
 
             int rowsAffetcted = getContentResolver().update(uri, values, null,null);
             if (rowsAffetcted == 0) {
