@@ -144,7 +144,7 @@ public class StockEditorActivity extends AppCompatActivity {
         values.put(StockEntry.COLUMN_STOCK_NAME, name);
         values.put(StockEntry.COLUMN_STOCK_PURCHASE_PRICE, price);
         values.put(StockEntry.COLUMN_STOCK_VOLUME, volume);
-        newData = new StockData(name,id,price,0.00,volume,"",0.00);
+        newData = new StockData(name,id,price,0.00,volume,"",0.00,0.00,0.00);
 
         if (this.uri == null) {
             Uri uri = getContentResolver().insert(StockEntry.CONTENT_URI, values);

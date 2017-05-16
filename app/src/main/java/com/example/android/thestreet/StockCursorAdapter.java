@@ -22,6 +22,8 @@ public class StockCursorAdapter extends RecyclerView.Adapter<StockCursorAdapter.
     TextView mActualChangeTextView;
     TextView mRelativeChangeTextView;
     TextView mDateTextView;
+    TextView mTodaysHighTextView;
+    TextView mTodaysLowTextView;
     private final ListItemClickListener mOnClickListener;
     StockData stockData;
     ArrayList<StockData> extracted_data;
@@ -43,7 +45,9 @@ public class StockCursorAdapter extends RecyclerView.Adapter<StockCursorAdapter.
                         data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_CURRENT_PRICE)),
                         data.getInt(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_VOLUME)),
                         data.getString(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_UPDATED)),
-                        data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_CHANGE)));
+                        data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_CHANGE)),
+                        data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_TODAYS_HIGH)),
+                        data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_TODAYS_LOW)));
                 stockData.add(sdata);
             } while (data.moveToNext());
             return stockData;
@@ -85,6 +89,8 @@ public class StockCursorAdapter extends RecyclerView.Adapter<StockCursorAdapter.
             mRelativeChangeTextView.setTextColor(Color.RED);
         }
         mRelativeChangeTextView.setText(String.format("%.2f", amt));
+        mTodaysHighTextView.setText(""+stockData.getHigh());
+        mTodaysLowTextView.setText(""+stockData.getLow());
         holder.itemView.setTag(extracted_data.get(position).getStockID());
 
     }
@@ -118,6 +124,8 @@ public class StockCursorAdapter extends RecyclerView.Adapter<StockCursorAdapter.
             mDateTextView = (TextView) itemView.findViewById(R.id.dateTextView);
             mCurrentPriceTextView = (TextView) itemView.findViewById(R.id.currentPriceTextView);
             mNameTextView = (TextView) itemView.findViewById(R.id.nameTextView);
+            mTodaysHighTextView = (TextView) itemView.findViewById(R.id.today_high);
+            mTodaysLowTextView = (TextView) itemView.findViewById(R.id.today_low);
             itemView.setOnClickListener(this);
         }
 

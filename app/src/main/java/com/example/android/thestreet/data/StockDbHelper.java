@@ -29,6 +29,8 @@ public class StockDbHelper extends SQLiteOpenHelper {
                 +StockEntry.COLUMN_STOCK_PURCHASE_PRICE+" REAL DEFAULT 0,"
                 +StockEntry.COLUMN_STOCK_CHANGE+" REAL,"
                 +StockEntry.COLUMN_STOCK_VOLUME+ " INTEGER DEFAULT 0,"
+                +StockEntry.COLUMN_STOCK_TODAYS_HIGH+ " REAL DEFAULT 0,"
+                +StockEntry.COLUMN_STOCK_TODAYS_LOW+ " REAL DEFAULT 0,"
                 +StockEntry.COLUMN_STOCK_UPDATED+ " TEXT);";
         db.execSQL(SQL_CREATE_STOCK_TABLE);
     }

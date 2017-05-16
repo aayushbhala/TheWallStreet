@@ -153,7 +153,9 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
                     StockEntry.COLUMN_STOCK_CHANGE,
                     StockEntry.COLUMN_STOCK_VOLUME,
                     StockEntry.COLUMN_STOCK_UPDATED,
-                    StockEntry.COLUMN_STOCK_PURCHASE_PRICE
+                    StockEntry.COLUMN_STOCK_PURCHASE_PRICE,
+                    StockEntry.COLUMN_STOCK_TODAYS_HIGH,
+                    StockEntry.COLUMN_STOCK_TODAYS_LOW
             };
             return new CursorLoader(MainActivity.this,StockEntry.CONTENT_URI,projections,null,null,null);
         }

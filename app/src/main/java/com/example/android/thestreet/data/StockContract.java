@@ -25,6 +25,8 @@ public class StockContract {
         public static final String COLUMN_STOCK_UPDATED = "last_updated";
         public static final String COLUMN_STOCK_VOLUME = "share_volume";
         public static final String COLUMN_STOCK_CHANGE = "change";
+        public static final String COLUMN_STOCK_TODAYS_HIGH = "high";
+        public static final String COLUMN_STOCK_TODAYS_LOW = "low";
 
         public static final String CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + PATH_STOCK;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + PATH_STOCK;

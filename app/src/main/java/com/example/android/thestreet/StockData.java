@@ -11,8 +11,9 @@ public class StockData {
     private int volume;
     private String date;
     private double change;
-
-    public StockData(String n,int id,double pp,double cp,int v,String d,double ch){
+    private double high;
+    private double low;
+    public StockData(String n,int id,double pp,double cp,int v,String d,double ch,double h,double l){
         name = n;
         stockID = id;
         purchasePrice = pp;
@@ -20,7 +21,27 @@ public class StockData {
         volume = v;
         date = d;
         change = ch;
+        high = h;
+        low = l;
     }
+
+    public double getHigh() {
+        return high;
+    }
+
+    public void setHigh(double high) {
+        this.high = high;
+    }
+
+    public double getLow() {
+        return low;
+    }
+
+    public void setLow(double low) {
+        this.low = low;
+    }
+
+
 
     public int getStockID() {
         return stockID;
