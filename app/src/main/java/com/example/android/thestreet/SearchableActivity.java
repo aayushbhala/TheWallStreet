@@ -49,6 +49,7 @@ public class SearchableActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putString("ID", "" + arrayList.get(position).getId());
                     bundle.putString("Name", arrayList.get(position).getName());
+                    bundle.putString("user_name",MainActivity.user_name);
                     intent1.putExtras(bundle);
                     startActivity(intent1);
                     finish();

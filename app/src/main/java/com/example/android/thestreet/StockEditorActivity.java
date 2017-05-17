@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.thestreet.data.StockContract.StockEntry;
@@ -35,7 +36,8 @@ public class StockEditorActivity extends AppCompatActivity {
     private StockData newData;
     private ProgressBar progressBar;
     private LinearLayout linearLayout;
-
+    private TextView mUserNameTextView;
+    public static int uid;
     private static final int CURSOR_LOADER_CALLBACK = 1;
     private static final int STOCK_PARSE_LOADER = 2;
     @Override
@@ -50,6 +52,8 @@ public class StockEditorActivity extends AppCompatActivity {
         mpriceEditText = (EditText) findViewById(R.id.input_purchase_priceEditText);
         mVolumeEditText = (EditText) findViewById(R.id.input_volumeEditText);
         mInsertButton = (Button) findViewById(R.id.insertButton);
+        mUserNameTextView = (TextView) findViewById(R.id.user_name);
+        mUserNameTextView.setText(getIntent().getExtras().getString("user_name"));
 
         if (uri != null) {
             getLoaderManager().initLoader(CURSOR_LOADER_CALLBACK, null, cursorLoaderCallbacks);
@@ -59,8 +63,10 @@ public class StockEditorActivity extends AppCompatActivity {
             this.setTitle("Add a new Stock");
             mInsertButton.setText("Add This");
             if(bundle!=null){
-                midEditText.setText(""+bundle.getString("ID"));
-                mNameEditText.setText(bundle.getString("Name"));
+                if(bundle.containsKey("ID"))
+                    midEditText.setText(""+bundle.getString("ID"));
+                if(bundle.containsKey("Name"))
+                    mNameEditText.setText(bundle.getString("Name"));
             }
         }
         progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
@@ -144,17 +150,16 @@ public class StockEditorActivity extends AppCompatActivity {
         values.put(StockEntry.COLUMN_STOCK_NAME, name);
         values.put(StockEntry.COLUMN_STOCK_PURCHASE_PRICE, price);
         values.put(StockEntry.COLUMN_STOCK_VOLUME, volume);
-        newData = new StockData(name,id,price,0.00,volume,"",0.00,0.00,0.00);
+        newData = new StockData(name,id,price,0.00,volume,"",0.00,0.00,0.00,MainActivity.user_id);
 
         if (this.uri == null) {
+            values.put(StockEntry.COLUMN_STOCK_HOLDER,uid);
             Uri uri = getContentResolver().insert(StockEntry.CONTENT_URI, values);
             long newRowId = ContentUris.parseId(uri);
             // Show a toast message depending on whether or not the insertion was successful
             if (newRowId == -1) {
                 // If the row ID is -1, then there was an error with insertion.
                 Toast.makeText(this, "Error with saving " + name, Toast.LENGTH_SHORT).show();
-            } else {
-                // Otherwise, the insertion was successful and we can display a toast with the row ID.
             }
         } else {
             int rowsAffetcted = getContentResolver().update(this.uri, values, null, null);
@@ -176,7 +181,11 @@ public class StockEditorActivity extends AppCompatActivity {
                     StockEntry.COLUMN_STOCK_PURCHASE_PRICE,
                     StockEntry.COLUMN_STOCK_VOLUME
             };
-            return new CursorLoader(StockEditorActivity.this, uri, projection, null, null, null);
+            String selection = StockEntry.TABLE_NAME+"."+ StockEntry.COLUMN_STOCK_HOLDER+"=?";
+            String[] selectionArgs = {
+                    getIntent().getBundleExtra("user_id").toString()
+            };
+            return new CursorLoader(StockEditorActivity.this, uri, projection, selection, selectionArgs, null);
         }
 
         @Override
@@ -220,6 +229,7 @@ public class StockEditorActivity extends AppCompatActivity {
                 values.put(StockEntry.COLUMN_STOCK_UPDATED, data.get(0).getDate());
                 values.put(StockEntry.COLUMN_STOCK_TODAYS_HIGH, data.get(0).getHigh());
                 values.put(StockEntry.COLUMN_STOCK_TODAYS_LOW, data.get(0).getLow());
+                values.put(StockEntry.COLUMN_STOCK_HOLDER, data.get(0).getUser_id());
 
                 int rowsAffetcted = getContentResolver().update(uri, values, null, null);
                 if (rowsAffetcted == 0) {

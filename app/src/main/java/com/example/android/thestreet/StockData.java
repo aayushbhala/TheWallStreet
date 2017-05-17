@@ -13,7 +13,10 @@ public class StockData {
     private double change;
     private double high;
     private double low;
-    public StockData(String n,int id,double pp,double cp,int v,String d,double ch,double h,double l){
+    private int user_id;
+
+
+    public StockData(String n,int id,double pp,double cp,int v,String d,double ch,double h,double l,int uid){
         name = n;
         stockID = id;
         purchasePrice = pp;
@@ -23,6 +26,15 @@ public class StockData {
         change = ch;
         high = h;
         low = l;
+        user_id=uid;
+    }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
     public double getHigh() {

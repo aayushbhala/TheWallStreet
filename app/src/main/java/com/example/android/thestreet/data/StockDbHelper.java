@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.android.thestreet.data.StockContract.StockEntry;
+import com.example.android.thestreet.data.StockContract.UserProfile;
 
 /**
  * Created by MAHE on 13-May-17.
@@ -21,7 +22,11 @@ public class StockDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String SQL_CREATE_STOCK_TABLE = "CREATE TABLE "+ StockEntry.TABLE_NAME + "("
+        String SQL_CREATE_STOCK_TABLE = "CREATE TABLE "+ UserProfile.TABLE_NAME + "("
+                + UserProfile._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + UserProfile.COLUMN_USER_NAME+ " TEXT NOT NULL);";
+        db.execSQL(SQL_CREATE_STOCK_TABLE);
+        String SQL_CREATE_STOCK_TABLE1 = "CREATE TABLE "+ StockEntry.TABLE_NAME + "("
                 +StockEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 +StockEntry.COLUMN_STOCK_ID + " INTEGER,"
                 +StockEntry.COLUMN_STOCK_NAME+ " TEXT NOT NULL,"
@@ -31,8 +36,10 @@ public class StockDbHelper extends SQLiteOpenHelper {
                 +StockEntry.COLUMN_STOCK_VOLUME+ " INTEGER DEFAULT 0,"
                 +StockEntry.COLUMN_STOCK_TODAYS_HIGH+ " REAL DEFAULT 0,"
                 +StockEntry.COLUMN_STOCK_TODAYS_LOW+ " REAL DEFAULT 0,"
-                +StockEntry.COLUMN_STOCK_UPDATED+ " TEXT);";
-        db.execSQL(SQL_CREATE_STOCK_TABLE);
+                +StockEntry.COLUMN_STOCK_UPDATED+ " TEXT,"
+                +StockEntry.COLUMN_STOCK_HOLDER+" INTEGER NOT NULL,"
+                +" FOREIGN KEY (" +StockEntry.COLUMN_STOCK_HOLDER+") REFERENCES "+ UserProfile.TABLE_NAME+"("+ UserProfile._ID+") ON DELETE CASCADE);";
+        db.execSQL(SQL_CREATE_STOCK_TABLE1);
     }
 
     @Override

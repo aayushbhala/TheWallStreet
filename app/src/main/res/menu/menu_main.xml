@@ -10,7 +10,7 @@
     <item android:id="@+id/search"
         android:title="@string/app_name"
         android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="collapseActionView|ifRoom"
+        app:showAsAction="collapseActionView|always"
         app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item
         android:id="@+id/add_stock"
@@ -22,5 +22,10 @@
         android:title="Profile"
         android:icon="@android:drawable/ic_menu_info_details"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/user"
+        android:title="Accounts"
+        android:icon="@android:drawable/ic_menu_edit"
+        app:showAsAction = "never"/>
 
 </menu>

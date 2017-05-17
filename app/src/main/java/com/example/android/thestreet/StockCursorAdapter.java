@@ -47,7 +47,8 @@ public class StockCursorAdapter extends RecyclerView.Adapter<StockCursorAdapter.
                         data.getString(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_UPDATED)),
                         data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_CHANGE)),
                         data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_TODAYS_HIGH)),
-                        data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_TODAYS_LOW)));
+                        data.getDouble(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_TODAYS_LOW)),
+                        data.getInt(data.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_HOLDER)));
                 stockData.add(sdata);
             } while (data.moveToNext());
             return stockData;

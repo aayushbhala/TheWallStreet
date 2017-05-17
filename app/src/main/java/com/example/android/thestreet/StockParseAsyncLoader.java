@@ -39,7 +39,7 @@ public class StockParseAsyncLoader extends AsyncTaskLoader<ArrayList<StockData>>
             String low = "";
             String high = "";
             String temp = url+stockData.get(i).getStockID();
-            Log.e("STOCK PARSE",temp);
+          //  Log.e("STOCK PARSE",temp);
             try {
                 Document doc = Jsoup.connect(temp).userAgent("Mozilla").get();
                 Element base_price = doc.getElementById("Bse_Prc_tick");
@@ -64,7 +64,8 @@ public class StockParseAsyncLoader extends AsyncTaskLoader<ArrayList<StockData>>
                     ch = ch.substring(0,4);
                 }
                 Double db = Double.parseDouble(ch);
-                StockData myData = new StockData(name_class,stockData.get(i).getStockID(), stockData.get(i).getPurchasePrice(), Double.parseDouble(price), stockData.get(i).getVolume(), date, db,Double.parseDouble(high),Double.parseDouble(low));
+                Log.e("STOCK PARSE",""+MainActivity.user_id);
+                StockData myData = new StockData(name_class,stockData.get(i).getStockID(), stockData.get(i).getPurchasePrice(), Double.parseDouble(price), stockData.get(i).getVolume(), date, db,Double.parseDouble(high),Double.parseDouble(low),MainActivity.user_id);
                 this.result.add(myData);
             } catch (IOException e) {
                 Log.d("ERROR IN DEBUG", "" + e);

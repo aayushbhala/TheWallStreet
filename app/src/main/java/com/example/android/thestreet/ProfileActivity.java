@@ -43,16 +43,21 @@ public class ProfileActivity extends AppCompatActivity {
         mSmallTextView = (TextView) findViewById(R.id.st_nd_rd_th);
         mMonthTextView = (TextView) findViewById(R.id.month);
         mTimeTextView = (TextView) findViewById(R.id.time);
+        int id = Integer.parseInt(getIntent().getExtras().getString("user_id"));
         SQLiteDatabase db = mdbHelper.getReadableDatabase();
         String[] projections = {
                 "SUM("+ StockContract.StockEntry.COLUMN_STOCK_PURCHASE_PRICE+"*"+StockContract.StockEntry.COLUMN_STOCK_VOLUME+")AS sum_pp",
                 "SUM("+ StockContract.StockEntry.COLUMN_STOCK_CURRENT_PRICE+"*"+StockContract.StockEntry.COLUMN_STOCK_VOLUME+")AS sum_cp",
         };
+        String selection = StockContract.StockEntry.COLUMN_STOCK_HOLDER+"=?";
+        String[] selectionArgs = {
+                ""+id
+        };
         Cursor cursor = db.query(
                 StockContract.StockEntry.TABLE_NAME,
                 projections,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null,
                 null,
                 null
@@ -79,56 +84,61 @@ public class ProfileActivity extends AppCompatActivity {
         Cursor cursor1 = db.query(
                 StockContract.StockEntry.TABLE_NAME,
                 projection2,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null,
                 null,
                 "gainers DESC"
         );
         cursor1.moveToFirst();
-        String date_time = cursor1.getString(cursor1.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_UPDATED));
-        mMaxGainers.setText(String.format("%.2f", cursor1.getDouble(cursor1.getColumnIndex("gainers"))));
-        if( cursor1.getDouble(cursor1.getColumnIndex("gainers"))>0){
-            mMaxGainers.setTextColor(Color.GREEN);
-        }else{
-            mMaxGainers.setTextColor(Color.RED);
-        }
-        mMaxName.setText(cursor1.getString(cursor1.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_NAME)));
-        cursor1.moveToLast();
-        mMinGainers.setText(String.format("%.2f", cursor1.getDouble(cursor1.getColumnIndex("gainers"))));
-        if( cursor1.getDouble(cursor1.getColumnIndex("gainers"))>0){
-            mMinGainers.setTextColor(Color.GREEN);
-        }else{
-            mMinGainers.setTextColor(Color.RED);
-        }
-        mMinName.setText(cursor1.getString(cursor1.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_NAME)));
-        cursor1.close();
+        if(cursor1.getCount()!=0) {
+            String date_time = cursor1.getString(cursor1.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_UPDATED));
+            mMaxGainers.setText(String.format("%.2f", cursor1.getDouble(cursor1.getColumnIndex("gainers"))));
+            if (cursor1.getDouble(cursor1.getColumnIndex("gainers")) > 0) {
+                mMaxGainers.setTextColor(Color.GREEN);
+            } else {
+                mMaxGainers.setTextColor(Color.RED);
+            }
+            mMaxName.setText(cursor1.getString(cursor1.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_NAME)));
+            cursor1.moveToLast();
+            mMinGainers.setText(String.format("%.2f", cursor1.getDouble(cursor1.getColumnIndex("gainers"))));
+            if (cursor1.getDouble(cursor1.getColumnIndex("gainers")) > 0) {
+                mMinGainers.setTextColor(Color.GREEN);
+            } else {
+                mMinGainers.setTextColor(Color.RED);
+            }
+            mMinName.setText(cursor1.getString(cursor1.getColumnIndex(StockContract.StockEntry.COLUMN_STOCK_NAME)));
+            cursor1.close();
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd,HH:mm");
-        String day = "";
-        String month = "";
-        String time = "";
-        try {
-            Date date = simpleDateFormat.parse(date_time);
-            day  = (String) DateFormat.format("dd",date);
-            month  = (String) DateFormat.format("MMM",date);
-            time  = (String) DateFormat.format("HH:mm",date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd,HH:mm");
+            String day = "";
+            String month = "";
+            String time = "";
+            try {
+                Date date = simpleDateFormat.parse(date_time);
+                day = (String) DateFormat.format("dd", date);
+                month = (String) DateFormat.format("MMM", date);
+                time = (String) DateFormat.format("HH:mm", date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            mDateTextView.setText(day);
+            mMonthTextView.setText(month);
+            mTimeTextView.setText(time);
+            switch (Integer.parseInt(day)) {
+                case 1:
+                    mSmallTextView.setText("st");
+                    break;
+                case 2:
+                    mSmallTextView.setText("nd");
+                    break;
+                case 3:
+                    mSmallTextView.setText("rd");
+                    break;
+                default:
+                    mSmallTextView.setText("th");
+                    break;
+            }
         }
-        mDateTextView.setText(day);
-        mMonthTextView.setText(month);
-        mTimeTextView.setText(time);
-        switch (Integer.parseInt(day)){
-            case 1: mSmallTextView.setText("st");
-                    break;
-            case 2:mSmallTextView.setText("nd");
-                 break;
-            case 3: mSmallTextView.setText("rd");
-                    break;
-            default:mSmallTextView.setText("th");
-                    break;
-        }
-
     }
 }
