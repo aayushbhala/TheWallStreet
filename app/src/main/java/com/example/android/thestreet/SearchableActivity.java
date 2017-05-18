@@ -79,6 +79,7 @@ public class SearchableActivity extends AppCompatActivity {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             try {
                 String csvLine;
+                reader.readLine();
                 while ((csvLine = reader.readLine()) != null) {
                     String[] row = csvLine.split(",");
                     if (row[2].toLowerCase().contains(key.toLowerCase())) {

@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -33,25 +34,28 @@ public class StockEditorActivity extends AppCompatActivity {
     private EditText mVolumeEditText;
     private Button mInsertButton;
     private Uri uri;
+    private int sid;
     private StockData newData;
     private ProgressBar progressBar;
     private LinearLayout linearLayout;
     private TextView mUserNameTextView;
-    public static int uid;
+    private TextView mLinkButton;
     private static final int CURSOR_LOADER_CALLBACK = 1;
     private static final int STOCK_PARSE_LOADER = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock_editor);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         uri = getIntent().getData();
-        Bundle bundle = getIntent().getExtras();
+        final Bundle bundle = getIntent().getExtras();
         midEditText = (EditText) findViewById(R.id.input_idEditText);
         mNameEditText = (EditText) findViewById(R.id.input_nameEditText);
         mpriceEditText = (EditText) findViewById(R.id.input_purchase_priceEditText);
         mVolumeEditText = (EditText) findViewById(R.id.input_volumeEditText);
         mInsertButton = (Button) findViewById(R.id.insertButton);
+        mLinkButton = (Button) findViewById(R.id.visitmnycntrl);
         mUserNameTextView = (TextView) findViewById(R.id.user_name);
         mUserNameTextView.setText(getIntent().getExtras().getString("user_name"));
 
@@ -59,13 +63,15 @@ public class StockEditorActivity extends AppCompatActivity {
             getLoaderManager().initLoader(CURSOR_LOADER_CALLBACK, null, cursorLoaderCallbacks);
             this.setTitle("Change Stock Details");
             mInsertButton.setText("Update This");
+            mLinkButton.setVisibility(View.VISIBLE);
         } else {
             this.setTitle("Add a new Stock");
+            mLinkButton.setVisibility(View.INVISIBLE);
             mInsertButton.setText("Add This");
-            if(bundle!=null){
-                if(bundle.containsKey("ID"))
-                    midEditText.setText(""+bundle.getString("ID"));
-                if(bundle.containsKey("Name"))
+            if (bundle != null) {
+                if (bundle.containsKey("ID"))
+                    midEditText.setText("" + bundle.getString("ID"));
+                if (bundle.containsKey("Name"))
                     mNameEditText.setText(bundle.getString("Name"));
             }
         }
@@ -99,21 +105,33 @@ public class StockEditorActivity extends AppCompatActivity {
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
-                if(isConnected){
+                if (isConnected) {
                     insertStock();
                     progressBar.setVisibility(View.VISIBLE);
                     linearLayout.setVisibility(View.INVISIBLE);
                     getSupportLoaderManager().initLoader(STOCK_PARSE_LOADER, null, arrayListLoaderCallbacks);
 
-                }else{
+                } else {
                     Toast.makeText(StockEditorActivity.this, "No Internet Connection Found", Toast.LENGTH_SHORT).show();
                 }
 
 
             }
         });
+        mLinkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String url = "http://www.moneycontrol.com/stocks/cptmarket/compsearchnew.php?search_data=&cid=&mbsearch_str=&topsearch_type=1&search_str=";
+                String temp = url + ""+sid;
+                Log.e("Editor",temp);
+                    Uri uri1 = Uri.parse(temp);
+                    Intent intent1 = new Intent(Intent.ACTION_VIEW, uri1);
+                    startActivity(intent1);
+            }
 
+        });
     }
+
     private void insertStock() {
         String name = "";
         int volume;
@@ -150,18 +168,20 @@ public class StockEditorActivity extends AppCompatActivity {
         values.put(StockEntry.COLUMN_STOCK_NAME, name);
         values.put(StockEntry.COLUMN_STOCK_PURCHASE_PRICE, price);
         values.put(StockEntry.COLUMN_STOCK_VOLUME, volume);
-        newData = new StockData(name,id,price,0.00,volume,"",0.00,0.00,0.00,MainActivity.user_id);
+        newData = new StockData(name, id, price, 0.00, volume, "", 0.00, 0.00, 0.00, MainActivity.user_id);
 
         if (this.uri == null) {
-            values.put(StockEntry.COLUMN_STOCK_HOLDER,uid);
+            values.put(StockEntry.COLUMN_STOCK_HOLDER, MainActivity.user_id);
             Uri uri = getContentResolver().insert(StockEntry.CONTENT_URI, values);
             long newRowId = ContentUris.parseId(uri);
+            Log.e("Stockedit", newRowId + "");
             // Show a toast message depending on whether or not the insertion was successful
             if (newRowId == -1) {
                 // If the row ID is -1, then there was an error with insertion.
                 Toast.makeText(this, "Error with saving " + name, Toast.LENGTH_SHORT).show();
             }
         } else {
+            Log.e("StockEditor", uri.toString());
             int rowsAffetcted = getContentResolver().update(this.uri, values, null, null);
             if (rowsAffetcted == 0) {
                 // If the row ID is -1, then there was an error with insertion.
@@ -181,9 +201,10 @@ public class StockEditorActivity extends AppCompatActivity {
                     StockEntry.COLUMN_STOCK_PURCHASE_PRICE,
                     StockEntry.COLUMN_STOCK_VOLUME
             };
-            String selection = StockEntry.TABLE_NAME+"."+ StockEntry.COLUMN_STOCK_HOLDER+"=?";
+            String selection = StockEntry.TABLE_NAME + "." + StockEntry.COLUMN_STOCK_HOLDER + "=?";
             String[] selectionArgs = {
-                    getIntent().getBundleExtra("user_id").toString()
+                    //getIntent().getBundleExtra("user_id").toString()
+                    "" + MainActivity.user_id
             };
             return new CursorLoader(StockEditorActivity.this, uri, projection, selection, selectionArgs, null);
         }
@@ -196,6 +217,7 @@ public class StockEditorActivity extends AppCompatActivity {
                 mNameEditText.setText(data.getString(data.getColumnIndex(StockEntry.COLUMN_STOCK_NAME)));
                 mpriceEditText.setText(String.valueOf(data.getDouble(data.getColumnIndex(StockEntry.COLUMN_STOCK_PURCHASE_PRICE))));
                 mVolumeEditText.setText("" + data.getInt(data.getColumnIndex(StockEntry.COLUMN_STOCK_VOLUME)));
+                sid = data.getInt(data.getColumnIndex(StockEntry.COLUMN_STOCK_ID));
             }
         }
 
@@ -215,12 +237,12 @@ public class StockEditorActivity extends AppCompatActivity {
         public android.support.v4.content.Loader<ArrayList<StockData>> onCreateLoader(int id, Bundle args) {
             ArrayList<StockData> stockData = new ArrayList<>();
             stockData.add(newData);
-            return new StockParseAsyncLoader(StockEditorActivity.this,stockData);
+            return new StockParseAsyncLoader(StockEditorActivity.this, stockData);
         }
 
         @Override
         public void onLoadFinished(android.support.v4.content.Loader<ArrayList<StockData>> loader, ArrayList<StockData> data) {
-            if(data.size()!=0) {
+            if (data.size() != 0) {
                 Uri uri = Uri.withAppendedPath(StockEntry.CONTENT_URI, "" + (data.get(0)).getStockID());
                 ContentValues values = new ContentValues();
                 values.put(StockEntry.COLUMN_STOCK_NAME, data.get(0).getName());

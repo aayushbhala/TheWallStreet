@@ -7,13 +7,11 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +31,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.android.thestreet.data.StockContract;
 import com.example.android.thestreet.data.StockContract.StockEntry;
 import com.example.android.thestreet.data.StockContract.UserProfile;
 import com.example.android.thestreet.data.StockDbHelper;
@@ -56,13 +53,14 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
     private SwipeRefreshLayout mSwipeRefresh;
     public static String user_name = "";
     public static int user_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+      /*  SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         boolean previouslyStarted = prefs.getBoolean(getString(R.string.pref_previously_started), false);
         if(!previouslyStarted) {
             SharedPreferences.Editor edit = prefs.edit();
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
             edit.commit();
             Intent intent = new Intent(this,CreateUserActivity.class);
             startActivity(intent);
-        }
+        }*/
         bundle = new Bundle();
         spinner = (Spinner) findViewById(R.id.spinner_user);
         setupSpinner();
@@ -123,12 +121,12 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
                         activeNetwork.isConnectedOrConnecting();
                 if(!isConnected)
                     Toast.makeText(MainActivity.this, "No Internet Connection Found", Toast.LENGTH_SHORT).show();
-                getSupportLoaderManager().initLoader(STOCK_PARSE_LOADER,null,arrayListLoaderCallbacks);
+                getSupportLoaderManager().restartLoader(STOCK_PARSE_LOADER, null, arrayListLoaderCallbacks);
             }
         });
+        getLoaderManager().restartLoader(USER_LOADER_CALLBACK,null,userCursorLoaderCallbacks);
 
     }
-
 
     private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
@@ -175,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
         Uri uri = Uri.withAppendedPath(StockEntry.CONTENT_URI, "" +id);
         int rowsAffected = getContentResolver().delete(uri,null,null);
         if(rowsAffected!=0){
+            Log.e("MainAct",rowsAffected+" "+id);
             Toast.makeText(this,"deleted",Toast.LENGTH_SHORT).show();
         }
         else
@@ -242,12 +241,9 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
             userArrayList.clear();
             arrayList.clear();
             if(cursor.getCount()==0){
-                Log.e("Main Act", "No user left");
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                SharedPreferences.Editor edit = prefs.edit();
-                edit.putBoolean(getString(R.string.pref_previously_started), Boolean.FALSE);
-                edit.commit();
                 Toast.makeText(MainActivity.this,"No Account Found Create a new one",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this,CreateUserActivity.class);
+                startActivity(intent);
             }
             while(cursor.moveToNext()){
                 String name = cursor.getString(cursor.getColumnIndex(UserProfile.COLUMN_USER_NAME));
@@ -279,15 +275,13 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
                     StockEntry.COLUMN_STOCK_TODAYS_HIGH,
                     StockEntry.COLUMN_STOCK_TODAYS_LOW,
                     StockEntry.COLUMN_STOCK_HOLDER,
-                    "(("+ StockContract.StockEntry.COLUMN_STOCK_CURRENT_PRICE+"-"+ StockContract.StockEntry.COLUMN_STOCK_PURCHASE_PRICE+")*"+
-                            StockContract.StockEntry.COLUMN_STOCK_VOLUME+") AS gainers"
             };
             String selection = StockEntry.TABLE_NAME+"."+ StockEntry.COLUMN_STOCK_HOLDER+"=?";
             String[] selectionArgs = {
                     ""+user_id
             };
 
-            return new CursorLoader(MainActivity.this,StockEntry.CONTENT_URI,projections,selection,selectionArgs,"gainers DESC");
+            return new CursorLoader(MainActivity.this,StockEntry.CONTENT_URI,projections,selection,selectionArgs, StockEntry.COLUMN_STOCK_NAME+" ASC");
         }
 
         @Override
@@ -342,9 +336,12 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
         }
     };
     private void updateStock(ArrayList<StockData> data){
+        if(data==null){
+            return;
+        }
         for(int i=0;i<data.size();i++){
             Log.e("mainact",""+data.size());
-            Uri uri = Uri.withAppendedPath(StockEntry.CONTENT_URI, "" +(data.get(i)).getStockID() );
+            Uri uri = Uri.withAppendedPath(StockEntry.CONTENT_URI, "" +(data.get(i)).getStockID());
             ContentValues values = new ContentValues();
             values.put(StockEntry.COLUMN_STOCK_NAME,data.get(i).getName());
             values.put(StockEntry.COLUMN_STOCK_CURRENT_PRICE,data.get(i).getCurrentPrice());

@@ -107,15 +107,31 @@
                 tools:text = "Aayush"
                 android:paddingTop="10dp"
                 android:textSize="15sp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/visitmnycntrl"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1.5"
+                android:paddingRight="10dp"
+                android:background="@android:color/transparent"
+                android:textColor="#000000"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Visit moneycontrol"/>
 
             <Button
                 android:id="@+id/insertButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center|bottom"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:text="ADD THIS"
                 android:textStyle="bold" />
+            </LinearLayout>
 
 
         </LinearLayout>

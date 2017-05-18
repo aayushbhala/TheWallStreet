@@ -32,6 +32,9 @@ public class StockParseAsyncLoader extends AsyncTaskLoader<ArrayList<StockData>>
     public ArrayList<StockData> loadInBackground() {
         String url = "http://www.moneycontrol.com/stocks/cptmarket/compsearchnew.php?search_data=&cid=&mbsearch_str=&topsearch_type=1&search_str=";
         result = new ArrayList<>();
+        if(stockData==null){
+            return null;
+        }
         for(int i=0;i<stockData.size();i++) {
             String name_class = "";
             String price = "";

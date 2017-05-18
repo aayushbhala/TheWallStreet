@@ -9,9 +9,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.android.thestreet.MainActivity;
-import com.example.android.thestreet.StockEditorActivity;
 import com.example.android.thestreet.data.StockContract.StockEntry;
 import com.example.android.thestreet.data.StockContract.UserProfile;
 
@@ -173,7 +173,8 @@ public class StockProvider extends ContentProvider {
         switch (match){
             case STOCK: return updateStocks(uri, values, selection, selectionArgs);
             case STOCK_ID:selection = StockEntry.COLUMN_STOCK_ID + "=?  AND "+StockEntry.COLUMN_STOCK_HOLDER + "=?";
-                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri)), ""+StockEditorActivity.uid};
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri)), ""+MainActivity.user_id};
+                Log.e("StockProvider",selectionArgs[0]+" "+selectionArgs[1]);
                 return updateStocks(uri, values, selection, selectionArgs);
             case USER: return updateUsers(uri,values,selection,selectionArgs);
             case USER_ID:selection = StockEntry._ID + "=?";
