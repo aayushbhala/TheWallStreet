@@ -31,6 +31,10 @@ public class StockCursorAdapter extends RecyclerView.Adapter<StockCursorAdapter.
         this.mOnClickListener = mOnClickListener;
         extracted_data = data;
     }
+    public void notify(ArrayList<StockData> list){
+        this.extracted_data = list;
+        notifyDataSetChanged();
+    }
 
     public ArrayList<StockData> swapData(Cursor data) {
         ArrayList<StockData> stockData = new ArrayList<>();

@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
     private SwipeRefreshLayout mSwipeRefresh;
     public static String user_name = "";
     public static int user_id;
+    private int postition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
                 if (!TextUtils.isEmpty(selection)) {
                     for (int i = 0; i < userArrayList.size(); i++) {
                         if (selection.equals(userArrayList.get(i))) {
-                            Log.e("MAIN ACTIVITY", selection);
+                          //  Log.e("MAIN ACTIVITY", selection);
                             user_name = selection;
                             user_id = arrayList.get(i).getUser_id();
                             getLoaderManager().restartLoader(CURSOR_LOADER_CALLBACK, null, cursorLoaderCallbacks);
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
         Uri uri = Uri.withAppendedPath(StockEntry.CONTENT_URI, "" +id);
         int rowsAffected = getContentResolver().delete(uri,null,null);
         if(rowsAffected!=0){
-            Log.e("MainAct",rowsAffected+" "+id);
+           // Log.e("MainAct",rowsAffected+" "+id);
             Toast.makeText(this,"deleted",Toast.LENGTH_SHORT).show();
         }
         else
@@ -294,10 +295,12 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
                 recyclerView.setVisibility(View.VISIBLE);
                 relativeLayout.setVisibility(View.INVISIBLE);
             }
-            StockCursorAdapter stockCursorAdapter = new StockCursorAdapter(MainActivity.this,sData);
+            stockCursorAdapter.notify(sData);
+          //  stockCursorAdapter = new StockCursorAdapter(MainActivity.this,sData);
+            Log.e("CursorAdapter","Here");
             stockData = sData;
-          //  getSupportLoaderManager().initLoader(STOCK_PARSE_LOADER,null,arrayListLoaderCallbacks);
-            recyclerView.setAdapter(stockCursorAdapter);
+          //getSupportLoaderManager().initLoader(STOCK_PARSE_LOADER,null,arrayListLoaderCallbacks);
+           // recyclerView.setAdapter(stockCursorAdapter);
         }
 
         @Override
@@ -310,11 +313,11 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
     @Override
     public void onListItemClick(int clickedItemID) {
         Intent intent = new Intent(MainActivity.this,StockEditorActivity.class);
-        intent.setData(Uri.withAppendedPath(StockEntry.CONTENT_URI, "" +(clickedItemID) ));
+        intent.setData(Uri.withAppendedPath(StockEntry.CONTENT_URI, "" + (clickedItemID)));
         bundle.putString("user_id", "" + user_id);
         bundle.putString("user_name", user_name);
         intent.putExtras(bundle);
-        Log.e("Hey There", "" + Uri.withAppendedPath(StockEntry.CONTENT_URI, "" + clickedItemID));
+       // Log.e("Hey There", "" + Uri.withAppendedPath(StockEntry.CONTENT_URI, "" + clickedItemID));
         startActivity(intent);
     }
 
@@ -326,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
 
         @Override
         public void onLoadFinished(android.support.v4.content.Loader<ArrayList<StockData>> loader, ArrayList<StockData> data) {
-            updateStock(data);
+           // updateStock(data);
             mSwipeRefresh.setRefreshing(false);
         }
 
@@ -340,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements StockCursorAdapte
             return;
         }
         for(int i=0;i<data.size();i++){
-            Log.e("mainact",""+data.size());
+          //  Log.e("mainact",""+data.size());
             Uri uri = Uri.withAppendedPath(StockEntry.CONTENT_URI, "" +(data.get(i)).getStockID());
             ContentValues values = new ContentValues();
             values.put(StockEntry.COLUMN_STOCK_NAME,data.get(i).getName());

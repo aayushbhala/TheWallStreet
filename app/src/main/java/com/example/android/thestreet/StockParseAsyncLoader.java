@@ -1,9 +1,14 @@
 package com.example.android.thestreet;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
+import com.example.android.thestreet.data.StockContract;
+
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -44,7 +49,9 @@ public class StockParseAsyncLoader extends AsyncTaskLoader<ArrayList<StockData>>
             String temp = url+stockData.get(i).getStockID();
           //  Log.e("STOCK PARSE",temp);
             try {
-                Document doc = Jsoup.connect(temp).userAgent("Mozilla").get();
+                Connection.Response response = Jsoup.connect(temp).userAgent("Mozilla").execute();
+                String body = response.body();
+                Document doc = Jsoup.parse(body);
                 Element base_price = doc.getElementById("Bse_Prc_tick");
                 price = base_price.text();
                 Log.e("STOCK PARSE",price);
@@ -67,20 +74,43 @@ public class StockParseAsyncLoader extends AsyncTaskLoader<ArrayList<StockData>>
                     ch = ch.substring(0,4);
                 }
                 Double db = Double.parseDouble(ch);
-                Log.e("STOCK PARSE",""+MainActivity.user_id);
+                Log.e("STOCK PARSE", "" + MainActivity.user_id);
                 StockData myData = new StockData(name_class,stockData.get(i).getStockID(), stockData.get(i).getPurchasePrice(), Double.parseDouble(price), stockData.get(i).getVolume(), date, db,Double.parseDouble(high),Double.parseDouble(low),MainActivity.user_id);
                 this.result.add(myData);
+                Runnable r = new MyThread(myData);
+                new Thread(r).start();
+
             } catch (IOException e) {
                 Log.d("ERROR IN DEBUG", "" + e);
             }
 
         }
+
         return result;
     }
 
-    @Override
-    public void deliverResult(ArrayList<StockData> data) {
-        super.deliverResult(data);
+    public class MyThread implements Runnable{
+        StockData myData;
+        public MyThread(StockData data){
+         myData = data;
+        }
+        @Override
+        public void run() {
+            Uri uri = Uri.withAppendedPath(StockContract.StockEntry.CONTENT_URI, "" +(myData).getStockID());
+            ContentValues values = new ContentValues();
+            values.put(StockContract.StockEntry.COLUMN_STOCK_NAME,myData.getName());
+            values.put(StockContract.StockEntry.COLUMN_STOCK_CURRENT_PRICE, myData.getCurrentPrice());
+            values.put(StockContract.StockEntry.COLUMN_STOCK_CHANGE, myData.getChange());
+            values.put(StockContract.StockEntry.COLUMN_STOCK_UPDATED, myData.getDate());
+            values.put(StockContract.StockEntry.COLUMN_STOCK_TODAYS_HIGH, myData.getHigh());
+            values.put(StockContract.StockEntry.COLUMN_STOCK_TODAYS_LOW, myData.getLow());
 
+            int rowsAffetcted = getContext().getContentResolver().update(uri, values, null, null);
+            if (rowsAffetcted == 0) {
+                // If the row ID is -1, then there was an error with insertion.
+                //Toast.makeText(this, "Error with updating", Toast.LENGTH_SHORT).show();
+                Log.e("StockParseupdate","error in updating");
+            }
+        }
     }
 }
